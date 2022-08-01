@@ -1,4 +1,4 @@
-package com.chan.rider.dto;
+package com.chan.rider.dto.workRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,23 +12,13 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Setter
-public class WorkRequestDto {
+public class WorkRequestLogisticsDto {
     @NotEmpty
-    private String accountId;
-
-    @NotEmpty
-    private Long riderId;
+    private String centerCode;
 
     @NotEmpty
     private LocalDate date;
 
     @NotEmpty
-    private String deliveryCode;
-
-    @NotEmpty
     private boolean isPM;
-
-    @NotEmpty
-    private int count;
-
 }

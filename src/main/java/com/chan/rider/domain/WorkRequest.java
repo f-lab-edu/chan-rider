@@ -13,9 +13,9 @@ import java.util.List;
 @Table(name = "work_requests")
 public class WorkRequest extends BaseEntity{
 
-    @Column(name = "delivery_code", length = 5)
+    @Column(name = "center_code", length = 5)
     @NotEmpty
-    private String deliveryCode;
+    private String centerCode;
 
     @Column(name = "date")
     @NotEmpty
@@ -41,8 +41,9 @@ public class WorkRequest extends BaseEntity{
     @OneToMany(mappedBy = "workRequest", cascade = CascadeType.ALL)
     private List<Invoice> invoices = new ArrayList<>();
 
-    public void setDeliveryCode(String deliveryCode) {
-        this.deliveryCode = deliveryCode;
+
+    public void setCenterCode(String centerCode) {
+        this.centerCode = centerCode;
     }
 
     public void setDate(LocalDate date) {
@@ -65,10 +66,8 @@ public class WorkRequest extends BaseEntity{
         this.rider = rider;
     }
 
-    public void setInvoices(List<Invoice> invoices) {
-        for (Invoice invoice : invoices) {
-            invoice.setWorkRequest(this);
-        }
-        this.invoices = invoices;
+    public void addInvoice(Invoice invoice) {
+        invoice.setWorkRequest(this);
+        this.invoices.add(invoice);
     }
 }

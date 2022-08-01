@@ -8,15 +8,10 @@ import javax.validation.constraints.NotEmpty;
 @Entity
 @Getter
 @Table(name = "invoices")
-public class Invoice{
+public class Invoice extends NameEntity{
 
-    @Id
-    @NotEmpty
-    private Long id;
-
-    @Column(name = "name", length = 10)
-    @NotEmpty
-    private String name;
+    @Column(name = "logistics_invoice_id")
+    private Long logisticsInvoiceId;
 
     @Embedded
     private Address address;
@@ -35,12 +30,8 @@ public class Invoice{
     private InvoiceStatusEnum status = InvoiceStatusEnum.ORDER;
 
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setLogisticsInvoiceId(Long logisticsInvoiceId) {
+        this.logisticsInvoiceId = logisticsInvoiceId;
     }
 
     public void setAddress(Address address) {

@@ -1,4 +1,4 @@
-package com.chan.rider.dto;
+package com.chan.rider.dto.rider;
 
 import com.chan.rider.domain.Address;
 import lombok.AllArgsConstructor;

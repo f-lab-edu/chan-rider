@@ -1,5 +1,6 @@
-package com.chan.rider.dto;
+package com.chan.rider.dto.invoice;
 
+import com.chan.rider.domain.Invoice;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,16 +8,13 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class InvoiceRequestDto {
-
-    @NotEmpty
-    private Long workRequestId;
-
+public class InvoiceListDto {
     @NotEmpty
     private Long riderId;
 
@@ -24,11 +22,9 @@ public class InvoiceRequestDto {
     private LocalDate date;
 
     @NotEmpty
-    private String deliveryCode;
-
-    @NotEmpty
     private boolean isPM;
 
     @NotEmpty
-    private int count;
+    private List<InvoiceItemDto> invoices;
+
 }
