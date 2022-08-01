@@ -8,7 +8,15 @@ import javax.validation.constraints.NotEmpty;
 @Entity
 @Getter
 @Table(name = "invoices")
-public class Invoice extends NameEntity{
+public class Invoice{
+
+    @Id
+    @NotEmpty
+    private Long id;
+
+    @Column(name = "name", length = 10)
+    @NotEmpty
+    private String name;
 
     @Embedded
     private Address address;
@@ -16,9 +24,6 @@ public class Invoice extends NameEntity{
     @Column(name = "telephone", length = 12)
     @NotEmpty
     private String telephone;
-
-    @Column(name = "logistics_invoice_id")
-    private Long logisticsInvoiceId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "work_request_id")
@@ -30,16 +35,20 @@ public class Invoice extends NameEntity{
     private InvoiceStatusEnum status = InvoiceStatusEnum.ORDER;
 
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setAddress(Address address) {
         this.address = address;
     }
 
     public void setTelephone(String telephone) {
         this.telephone = telephone;
-    }
-
-    public void setLogisticsInvoiceId(Long logisticsInvoiceId) {
-        this.logisticsInvoiceId = logisticsInvoiceId;
     }
 
     public void setWorkRequest(WorkRequest workRequest) {
