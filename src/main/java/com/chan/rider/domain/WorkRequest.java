@@ -2,11 +2,11 @@ package com.chan.rider.domain;
 
 import lombok.Getter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,6 +17,10 @@ public class WorkRequest extends BaseEntity{
     @NotEmpty
     private String deliveryCode;
 
+    @Column(name = "date")
+    @NotEmpty
+    private LocalDate date;
+
     @Column(name = "is_pm")
     @NotEmpty
     private boolean isPM;
@@ -25,11 +29,24 @@ public class WorkRequest extends BaseEntity{
     @NotEmpty
     private int count;
 
-    @OneToOne(mappedBy = "workRequest")
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    @NotEmpty
+    private WorkRequestStatusEnum workRequestStatusEnum;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rider_id")
     private Rider rider;
+
+    @OneToMany(mappedBy = "workRequest", cascade = CascadeType.ALL)
+    private List<Invoice> invoices = new ArrayList<>();
 
     public void setDeliveryCode(String deliveryCode) {
         this.deliveryCode = deliveryCode;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public void setPM(boolean PM) {
@@ -40,7 +57,18 @@ public class WorkRequest extends BaseEntity{
         this.count = count;
     }
 
+    public void setWorkRequestStatusEnum(WorkRequestStatusEnum workRequestStatusEnum) {
+        this.workRequestStatusEnum = workRequestStatusEnum;
+    }
+
     public void setRider(Rider rider) {
         this.rider = rider;
+    }
+
+    public void setInvoices(List<Invoice> invoices) {
+        for (Invoice invoice : invoices) {
+            invoice.setWorkRequest(this);
+        }
+        this.invoices = invoices;
     }
 }

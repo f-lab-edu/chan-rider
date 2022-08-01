@@ -14,9 +14,11 @@ import java.util.List;
 @Getter
 @Setter
 public class InvoiceMatchDto {
-
     @NotEmpty
     private Long riderId;
+
+    @NotEmpty
+    private Long workRequestId;
 
     @NotEmpty
     private List<Invoice> invoices;

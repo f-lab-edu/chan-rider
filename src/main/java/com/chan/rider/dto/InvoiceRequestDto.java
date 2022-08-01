@@ -12,9 +12,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Setter
-public class WorkRequestDto {
+public class InvoiceRequestDto {
+
     @NotEmpty
-    private String accountId;
+    private Long workRequestId;
 
     @NotEmpty
     private Long riderId;
@@ -30,5 +31,4 @@ public class WorkRequestDto {
 
     @NotEmpty
     private int count;
-
 }

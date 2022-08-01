@@ -1,10 +1,8 @@
 package com.chan.rider.repository;
 
 import com.chan.rider.domain.Rider;
-import org.springframework.data.repository.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RiderRepository extends Repository<Rider, Integer> {
-    void save(Rider rider);
-
+public interface RiderRepository extends JpaRepository<Rider, Integer> {
     Rider findById(Long id);
 }

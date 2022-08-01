@@ -21,16 +21,14 @@ public class Invoice extends NameEntity{
     private Long logisticsInvoiceId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rider_id")
-    private Rider rider;
+    @JoinColumn(name = "work_request_id")
+    private WorkRequest workRequest;
 
     @Column(name = "status")
     @NotEmpty
+    @Enumerated(EnumType.STRING)
     private InvoiceStatusEnum status = InvoiceStatusEnum.ORDER;
 
-    public void setRider(Rider rider) {
-        this.rider = rider;
-    }
 
     public void setAddress(Address address) {
         this.address = address;
@@ -42,5 +40,13 @@ public class Invoice extends NameEntity{
 
     public void setLogisticsInvoiceId(Long logisticsInvoiceId) {
         this.logisticsInvoiceId = logisticsInvoiceId;
+    }
+
+    public void setWorkRequest(WorkRequest workRequest) {
+        this.workRequest = workRequest;
+    }
+
+    public void setStatus(InvoiceStatusEnum status) {
+        this.status = status;
     }
 }

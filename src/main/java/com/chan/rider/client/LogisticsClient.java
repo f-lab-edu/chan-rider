@@ -1,7 +1,7 @@
 package com.chan.rider.client;
 
 import com.chan.rider.common.Message;
-import com.chan.rider.dto.WorkRequestDto;
+import com.chan.rider.dto.InvoiceRequestDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,5 +10,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface LogisticsClient {
 
     @PutMapping("/logistics/delivery")
-    Message requestDelivery(@RequestBody WorkRequestDto deliveryRegisterDto);
+    Message requestDelivery(@RequestBody InvoiceRequestDto invoiceRequestDto);
 }

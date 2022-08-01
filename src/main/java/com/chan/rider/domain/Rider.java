@@ -23,12 +23,9 @@ public class Rider extends NameEntity {
     @Embedded
     private Address address;
 
-    @OneToOne
-    @JoinColumn(name = "work_request_id")
-    private WorkRequest workRequest;
-
     @OneToMany(mappedBy = "rider", cascade = CascadeType.ALL)
-    private List<Invoice> invoices = new ArrayList<>();
+    private List<WorkRequest> workRequests = new ArrayList<>();
+
 
     public void setAccountId(String accountId) {
         this.accountId = accountId;
@@ -42,12 +39,8 @@ public class Rider extends NameEntity {
         this.address = address;
     }
 
-    public void addInvoice(Invoice invoice) {
-        invoice.setRider(this);
-        this.invoices.add(invoice);
-    }
-
-    public void setWorkRequest(WorkRequest workRequest) {
-        this.workRequest = workRequest;
+    public void addWorkRequest(WorkRequest workRequest) {
+        workRequest.setRider(this);
+        workRequests.add(workRequest);
     }
 }

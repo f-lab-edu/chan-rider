@@ -6,7 +6,9 @@ import com.chan.rider.common.StatusEnum;
 import com.chan.rider.domain.Invoice;
 import com.chan.rider.domain.Rider;
 import com.chan.rider.domain.WorkRequest;
+import com.chan.rider.domain.WorkRequestStatusEnum;
 import com.chan.rider.dto.InvoiceMatchDto;
+import com.chan.rider.dto.InvoiceRequestDto;
 import com.chan.rider.dto.WorkRequestDto;
 import com.chan.rider.dto.RiderDto;
 import com.chan.rider.repository.InvoiceRepository;
@@ -50,37 +52,47 @@ public class RiderService {
             throw new RuntimeException();
         }
 
-        Message message = this.logisticsClient.requestDelivery(dto);
+        WorkRequest workRequest = new WorkRequest();
+        workRequest.setDeliveryCode(dto.getDeliveryCode());
+        workRequest.setPM(dto.isPM());
+        workRequest.setCount(dto.getCount());
+        workRequest.setDate(dto.getDate());
+        workRequest.setRider(rider);
+        workRequest.setWorkRequestStatusEnum(WorkRequestStatusEnum.SUBMIT);
+        this.workRequestRepository.save(workRequest);
+
+        InvoiceRequestDto invoiceRequestDto = new InvoiceRequestDto();
+        invoiceRequestDto.setWorkRequestId(workRequest.getId());
+        invoiceRequestDto.setRiderId(rider.getId());
+        invoiceRequestDto.setDate(workRequest.getDate());
+        invoiceRequestDto.setDeliveryCode(workRequest.getDeliveryCode());
+        invoiceRequestDto.setPM(workRequest.isPM());
+        invoiceRequestDto.setCount(workRequest.getCount());
+
+        Message message = this.logisticsClient.requestDelivery(invoiceRequestDto);
 
         if (message.getStatus().equals(StatusEnum.BAD_REQUEST)) {
             throw new RuntimeException();
         }
 
-        WorkRequest workRequest = new WorkRequest();
-        workRequest.setDeliveryCode(dto.getDeliveryCode());
-        workRequest.setPM(dto.isPM());
-        workRequest.setCount(dto.getCount());
-        workRequest.setRider(rider);
-        rider.setWorkRequest(workRequest);
-
-        this.workRequestRepository.save(workRequest);
-        this.riderRepository.save(rider);
-
         return message;
     }
+
 
     @Transactional
     public Message matchDelivery(InvoiceMatchDto dto) {
         Message message = new Message();
-        Rider rider = this.riderRepository.findById(dto.getRiderId());
+        WorkRequest workRequest = this.workRequestRepository.findById(dto.getWorkRequestId());
 
-        if (rider == null) {
+        if (workRequest == null) {
             message.setStatus(StatusEnum.BAD_REQUEST);
             message.setMessage("일치하는 라이더가 없습니다.");
             return message;
         }
 
+        workRequest.setWorkRequestStatusEnum(WorkRequestStatusEnum.DELIVERY_WAIT);
         List<Invoice> invoices = dto.getInvoices();
+        workRequest.setInvoices(invoices);
         this.invoiceRepository.saveAll(invoices);
 
         message.setStatus(StatusEnum.OK);
