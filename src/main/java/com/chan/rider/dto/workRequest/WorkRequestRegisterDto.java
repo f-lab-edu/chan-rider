@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
 
 @NoArgsConstructor
@@ -16,19 +19,17 @@ public class WorkRequestRegisterDto {
     @NotEmpty
     private String accountId;
 
-    @NotEmpty
     private Long riderId;
 
-    @NotEmpty
+    @NotNull
     private LocalDate date;
 
     @NotEmpty
     private String centerCode;
 
-    @NotEmpty
-    private boolean isPM;
+    private boolean pm;
 
-    @NotEmpty
+    @PositiveOrZero
     private int count;
 
 }

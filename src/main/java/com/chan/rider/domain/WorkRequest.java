@@ -4,6 +4,8 @@ import lombok.Getter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,20 +20,19 @@ public class WorkRequest extends BaseEntity{
     private String centerCode;
 
     @Column(name = "date")
-    @NotEmpty
+    @NotNull
     private LocalDate date;
 
     @Column(name = "is_pm")
-    @NotEmpty
     private boolean isPM;
 
     @Column(name = "count")
-    @NotEmpty
+    @Positive
     private int count;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    @NotEmpty
+    @NotNull
     private WorkRequestStatusEnum workRequestStatusEnum;
 
     @ManyToOne(fetch = FetchType.LAZY)
