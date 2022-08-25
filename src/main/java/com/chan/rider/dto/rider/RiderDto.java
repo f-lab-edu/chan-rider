@@ -1,18 +1,22 @@
 package com.chan.rider.dto.rider;
 
 import com.chan.rider.domain.Address;
+import com.chan.rider.domain.Rider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class RiderDto {
+
+    private Long id;
 
     @NotEmpty
     private String accountId;
@@ -23,6 +27,15 @@ public class RiderDto {
     @NotEmpty
     private String telephone;
 
-    @NotEmpty
+    @NotNull
     private Address address;
+
+    public RiderDto(Rider rider) {
+        this.id = rider.getId();
+        this.accountId = rider.getAccountId();
+        this.name = rider.getName();
+        this.telephone = rider.getTelephone();
+        this.address = rider.getAddress();
+    }
+
 }

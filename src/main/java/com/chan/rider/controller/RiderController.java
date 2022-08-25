@@ -10,6 +10,7 @@ import com.chan.rider.dto.workRequest.WorkRequestLogisticsDto;
 import com.chan.rider.dto.workRequest.WorkRequestRegisterDto;
 import com.chan.rider.dto.rider.RiderDto;
 import com.chan.rider.service.RiderService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,26 +37,26 @@ public class RiderController {
     }
 
     @PostMapping("/delivery/register")
-    public ResponseEntity<Message> registerDelivery(@Valid @RequestBody WorkRequestRegisterDto dto) {
+    public ResponseEntity<Message> registerDelivery(@Valid @RequestBody WorkRequestRegisterDto dto) throws JsonProcessingException {
         Message message = new Message();
 
         WorkRequest workRequest = this.riderService.registerDelivery(dto);
         message.setStatus(StatusEnum.OK);
         message.setMessage("출근 등록 완료");
-        message.setData(workRequest);
+        //message.setData(workRequest);
 
         return ResponseEntity.ok().body(message);
     }
 
     @GetMapping("/delivery")
-    public ResponseEntity<Message> getRiders(@Valid @RequestBody WorkRequestLogisticsDto dto) {
+    public ResponseEntity<Message> getRiders(@Valid @RequestBody WorkRequestLogisticsDto dto) throws JsonProcessingException {
         Message message = new Message();
 
-        WorkRequestListDto workRequestListDto = this.riderService.createWorkRequestListDto(dto);
+        RiderDto riderDto = this.riderService.createWorkRequestListDto(dto);
 
         message.setStatus(StatusEnum.OK);
         message.setMessage("ok");
-        message.setData(workRequestListDto);
+        message.setData(riderDto);
 
         return ResponseEntity.ok().body(message);
     }
