@@ -16,7 +16,7 @@ public class Rider extends NameEntity {
     @NotEmpty
     private String accountId;
 
-    @Column(name = "telephone", length = 12)
+    @Column(name = "telephone", length = 13)
     @NotEmpty
     private String telephone;
 

@@ -2,6 +2,7 @@ package com.chan.rider.service;
 
 import com.chan.rider.common.Message;
 import com.chan.rider.common.StatusEnum;
+import com.chan.rider.dao.RiderWaitingListDao;
 import com.chan.rider.domain.Invoice;
 import com.chan.rider.domain.Rider;
 import com.chan.rider.domain.WorkRequest;
@@ -39,9 +40,9 @@ public class RiderService {
 
     private final WorkRequestRepository workRequestRepository;
 
-    private final RedisTemplate<String, Object> redisTemplate;
-
     private final ObjectMapper objectMapper;
+
+    private final RiderWaitingListDao riderWaitingListDao;
 
     @Transactional
     public Rider signUp(RiderDto dto) {
@@ -75,10 +76,7 @@ public class RiderService {
         this.workRequestRepository.save(workRequest);
 
         //대기 리스트에 등록
-        String key = makeKey(dto.getCenterCode(), dto.getDate(), dto.isPm());
-        RiderDto riderDto = new RiderDto(rider);
-        String riderValue = objectMapper.writeValueAsString(riderDto);
-        this.redisTemplate.opsForList().rightPush(key, riderValue);
+        riderWaitingListDao.pushRider(dto.getCenterCode(), dto.getDate(), dto.isPm(), rider);
 
         return workRequest;
     }
@@ -87,11 +85,8 @@ public class RiderService {
     public RiderDto createWorkRequestListDto(WorkRequestLogisticsDto dto) throws JsonProcessingException {
 
         //대기 리스트에서 대기중인 Rider pop
-        String key = makeKey(dto.getCenterCode(), dto.getDate(), dto.isPm());
-        Object riderValue = this.redisTemplate.opsForList().leftPop(key);
-        if(riderValue != null){
-            RiderDto riderInfo = objectMapper.readValue(riderValue.toString(), RiderDto.class);
-
+        RiderDto riderInfo = riderWaitingListDao.popRider(dto.getCenterCode(), dto.getDate(), dto.isPm());
+        if(riderInfo != null){
             //해당하는 라이더의 근무요청 데이터 찾아서 상태 변경
             WorkRequest workRequest = this.workRequestRepository.findByRiderIdAndDateAndIsPM(riderInfo.getId(), dto.getDate(), dto.isPm());
             workRequest.setWorkRequestStatusEnum(WorkRequestStatusEnum.DELIVERY_WAIT);
@@ -130,12 +125,6 @@ public class RiderService {
         return message;
     }
 
-    private String makeKey(String centerCode, LocalDate date, boolean isPM){
 
-        String meridiem = isPM ? "PM" : "AM";
-
-        return centerCode + "_" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + meridiem;
-
-    }
 
 }

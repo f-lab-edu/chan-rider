@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Embeddable
 @NoArgsConstructor @AllArgsConstructor
@@ -28,6 +29,19 @@ public class Address {
 
     public void setSigunguCode(int sigunguCode) {
         this.sigunguCode = sigunguCode;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return getSigunguCode() == address.getSigunguCode() && Objects.equals(getDoroAddress(), address.getDoroAddress());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDoroAddress(), getSigunguCode());
     }
 }
 

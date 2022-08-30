@@ -12,4 +12,5 @@ public interface WorkRequestRepository extends JpaRepository<WorkRequest, Intege
     List<WorkRequest> findByCenterCodeAndDateAndIsPM(String centerCode, LocalDate date, boolean isPM);
 
     WorkRequest findByRiderIdAndDateAndIsPM(Long riderId, LocalDate date, boolean isPM);
+
 }
