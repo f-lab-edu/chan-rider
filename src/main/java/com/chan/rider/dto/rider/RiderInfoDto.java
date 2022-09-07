@@ -9,13 +9,14 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class RiderDto {
+public class RiderInfoDto {
+
+    private Long id;
 
     @NotEmpty
     private String accountId;
@@ -29,4 +30,11 @@ public class RiderDto {
     @NotNull
     private Address address;
 
+    public RiderInfoDto(Rider rider) {
+        this.id = rider.getId();
+        this.accountId = rider.getAccountId();
+        this.name = rider.getName();
+        this.telephone = rider.getTelephone();
+        this.address = rider.getAddress();
+    }
 }

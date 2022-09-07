@@ -4,6 +4,7 @@ import com.chan.rider.domain.Rider;
 import com.chan.rider.domain.WorkRequest;
 import com.chan.rider.domain.WorkRequestStatusEnum;
 import com.chan.rider.dto.rider.RiderDto;
+import com.chan.rider.dto.rider.RiderInfoDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -21,23 +22,22 @@ public class RiderWaitingListDao {
 
     private final ObjectMapper objectMapper;
 
-    public boolean pushRider(String centerCode, LocalDate date, boolean isPM, Rider rider) throws JsonProcessingException {
+    public boolean pushRider(String localCode, LocalDate date, boolean isPM, RiderInfoDto riderInfo) throws JsonProcessingException {
 
         //대기 리스트에 등록
-        String key = makeKey(centerCode, date, isPM);
-        RiderDto riderDto = new RiderDto(rider);
-        String riderValue = objectMapper.writeValueAsString(riderDto);
+        String key = makeKey(localCode, date, isPM);
+        String riderValue = objectMapper.writeValueAsString(riderInfo);
 
         return  this.redisTemplate.opsForList().rightPush(key, riderValue) != null ? true : false;
     }
 
-    public RiderDto popRider(String centerCode, LocalDate date, boolean isPM) throws JsonProcessingException {
+    public RiderInfoDto popRider(String localCode, LocalDate date, boolean isPM) throws JsonProcessingException {
 
         //대기 리스트에서 대기중인 Rider pop
-        String key = makeKey(centerCode, date, isPM);
+        String key = makeKey(localCode, date, isPM);
         Object riderValue = this.redisTemplate.opsForList().leftPop(key);
         if(riderValue != null){
-            RiderDto riderInfo = objectMapper.readValue(riderValue.toString(), RiderDto.class);
+            RiderInfoDto riderInfo = objectMapper.readValue(riderValue.toString(), RiderInfoDto.class);
             return riderInfo;
         }
         else{
@@ -45,11 +45,11 @@ public class RiderWaitingListDao {
         }
     }
 
-    private String makeKey(String centerCode, LocalDate date, boolean isPM){
+    private String makeKey(String localCode, LocalDate date, boolean isPM){
 
         String meridiem = isPM ? "PM" : "AM";
 
-        return centerCode + "_" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + meridiem;
+        return localCode + "_" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + meridiem;
 
     }
 }

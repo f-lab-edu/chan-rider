@@ -1,30 +1,24 @@
-package com.chan.rider.dto.invoice;
+package com.chan.rider.dto.workRequest;
 
-import com.chan.rider.domain.Invoice;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class InvoiceListDto {
+public class RiderRequestDto {
     @NotEmpty
-    private Long riderId;
+    private String localCode;
 
-    @NotEmpty
+    @NotNull
     private LocalDate date;
 
-    @NotEmpty
-    private boolean isPM;
-
-    @NotEmpty
-    private List<InvoiceItemDto> invoices;
-
+    private boolean pm;
 }

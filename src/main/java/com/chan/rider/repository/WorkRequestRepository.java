@@ -9,7 +9,7 @@ import java.util.List;
 public interface WorkRequestRepository extends JpaRepository<WorkRequest, Integer> {
     WorkRequest findById(Long id);
 
-    List<WorkRequest> findByCenterCodeAndDateAndIsPM(String centerCode, LocalDate date, boolean isPM);
+    List<WorkRequest> findByLocalCodeAndDateAndIsPM(String localCode, LocalDate date, boolean isPM);
 
     WorkRequest findByRiderIdAndDateAndIsPM(Long riderId, LocalDate date, boolean isPM);
 

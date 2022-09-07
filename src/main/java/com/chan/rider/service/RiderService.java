@@ -1,16 +1,11 @@
 package com.chan.rider.service;
 
-import com.chan.rider.common.Message;
-import com.chan.rider.common.StatusEnum;
 import com.chan.rider.dao.RiderWaitingListDao;
-import com.chan.rider.domain.Invoice;
-import com.chan.rider.domain.Rider;
-import com.chan.rider.domain.WorkRequest;
-import com.chan.rider.domain.WorkRequestStatusEnum;
+import com.chan.rider.domain.*;
 import com.chan.rider.dto.invoice.InvoiceItemDto;
-import com.chan.rider.dto.invoice.InvoiceListDto;
-import com.chan.rider.dto.workRequest.WorkRequestListDto;
-import com.chan.rider.dto.workRequest.WorkRequestLogisticsDto;
+import com.chan.rider.dto.invoice.MatchingRequestDto;
+import com.chan.rider.dto.rider.RiderInfoDto;
+import com.chan.rider.dto.workRequest.RiderRequestDto;
 import com.chan.rider.dto.workRequest.WorkRequestRegisterDto;
 import com.chan.rider.dto.rider.RiderDto;
 import com.chan.rider.exception.RiderFindFailException;
@@ -18,16 +13,11 @@ import com.chan.rider.repository.InvoiceRepository;
 import com.chan.rider.repository.RiderRepository;
 import com.chan.rider.repository.WorkRequestRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -40,8 +30,6 @@ public class RiderService {
 
     private final WorkRequestRepository workRequestRepository;
 
-    private final ObjectMapper objectMapper;
-
     private final RiderWaitingListDao riderWaitingListDao;
 
     @Transactional
@@ -51,21 +39,21 @@ public class RiderService {
         rider.setName(dto.getName());
         rider.setTelephone(dto.getTelephone());
         rider.setAddress(dto.getAddress());
-        this.riderRepository.save(rider);
 
-        return rider;
+        return this.riderRepository.save(rider);
     }
 
     @Transactional
     public WorkRequest registerDelivery(WorkRequestRegisterDto dto) throws JsonProcessingException {
+
         Rider rider = this.riderRepository.findById(dto.getRiderId());
 
         if (rider == null) {
-            throw new RuntimeException();
+            throw new RiderFindFailException("라이더 정보를 찾을 수 없습니다.");
         }
 
         WorkRequest workRequest = new WorkRequest();
-        workRequest.setCenterCode(dto.getCenterCode());
+        workRequest.setLocalCode(dto.getLocalCode());
         workRequest.setPM(dto.isPm());
         workRequest.setCount(dto.getCount());
         workRequest.setDate(dto.getDate());
@@ -76,16 +64,17 @@ public class RiderService {
         this.workRequestRepository.save(workRequest);
 
         //대기 리스트에 등록
-        riderWaitingListDao.pushRider(dto.getCenterCode(), dto.getDate(), dto.isPm(), rider);
+        RiderInfoDto riderInfo = new RiderInfoDto(rider);
+        riderWaitingListDao.pushRider(dto.getLocalCode(), dto.getDate(), dto.isPm(), riderInfo);
 
         return workRequest;
     }
 
     @Transactional
-    public RiderDto createWorkRequestListDto(WorkRequestLogisticsDto dto) throws JsonProcessingException {
+    public RiderInfoDto riderRequest(RiderRequestDto dto) throws JsonProcessingException {
 
         //대기 리스트에서 대기중인 Rider pop
-        RiderDto riderInfo = riderWaitingListDao.popRider(dto.getCenterCode(), dto.getDate(), dto.isPm());
+        RiderInfoDto riderInfo = riderWaitingListDao.popRider(dto.getLocalCode(), dto.getDate(), dto.isPm());
         if(riderInfo != null){
             //해당하는 라이더의 근무요청 데이터 찾아서 상태 변경
             WorkRequest workRequest = this.workRequestRepository.findByRiderIdAndDateAndIsPM(riderInfo.getId(), dto.getDate(), dto.isPm());
@@ -101,30 +90,17 @@ public class RiderService {
     }
 
     @Transactional
-    public Message matchDelivery(InvoiceListDto dto) {
-        Message message = new Message();
+    public List<Invoice> matchDelivery(MatchingRequestDto dto) {
         WorkRequest workRequest = this.workRequestRepository.findByRiderIdAndDateAndIsPM(dto.getRiderId(), dto.getDate(), dto.isPM());
 
-        if (workRequest == null) {
-            message.setStatus(StatusEnum.BAD_REQUEST);
-            message.setMessage("일치하는 라이더가 없습니다.");
-            return message;
-        }
-
-        for (InvoiceItemDto item : dto.getInvoices()) {
-            Invoice invoice = new Invoice();
-            invoice.setLogisticsInvoiceId(item.getInvoiceId());
-            invoice.setName(item.getName());
-            invoice.setAddress(item.getAddress());
-            invoice.setTelephone(item.getTelephone());
+        List<Invoice> invoiceList = dto.getInvoices().stream().map(item ->{
+            Invoice invoice = item.toEntity();
+            invoice.setStatus(InvoiceStatusEnum.MATCHING);
             workRequest.addInvoice(invoice);
-            this.invoiceRepository.save(invoice);
-        }
+            return invoice;
+        }).toList();
 
-        message.setStatus(StatusEnum.OK);
-        return message;
+        return this.invoiceRepository.saveAll(invoiceList);
     }
-
-
 
 }

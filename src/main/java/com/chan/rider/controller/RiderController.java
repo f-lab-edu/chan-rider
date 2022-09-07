@@ -2,11 +2,14 @@ package com.chan.rider.controller;
 
 import com.chan.rider.common.Message;
 import com.chan.rider.common.StatusEnum;
+import com.chan.rider.domain.Invoice;
 import com.chan.rider.domain.Rider;
 import com.chan.rider.domain.WorkRequest;
-import com.chan.rider.dto.invoice.InvoiceListDto;
-import com.chan.rider.dto.workRequest.WorkRequestListDto;
-import com.chan.rider.dto.workRequest.WorkRequestLogisticsDto;
+import com.chan.rider.dto.invoice.InvoiceItemDto;
+import com.chan.rider.dto.invoice.MatchingRequestDto;
+import com.chan.rider.dto.invoice.MatchingResponseDto;
+import com.chan.rider.dto.rider.RiderInfoDto;
+import com.chan.rider.dto.workRequest.RiderRequestDto;
 import com.chan.rider.dto.workRequest.WorkRequestRegisterDto;
 import com.chan.rider.dto.rider.RiderDto;
 import com.chan.rider.service.RiderService;
@@ -16,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,21 +53,33 @@ public class RiderController {
     }
 
     @GetMapping("/delivery")
-    public ResponseEntity<Message> getRiders(@Valid @RequestBody WorkRequestLogisticsDto dto) throws JsonProcessingException {
+    public ResponseEntity<Message> getRider(@Valid @RequestBody RiderRequestDto dto) throws JsonProcessingException {
         Message message = new Message();
 
-        RiderDto riderDto = this.riderService.createWorkRequestListDto(dto);
+        RiderInfoDto riderInfo = this.riderService.riderRequest(dto);
 
         message.setStatus(StatusEnum.OK);
-        message.setMessage("ok");
-        message.setData(riderDto);
+        message.setMessage("라이더 반환 완료");
+        message.setData(riderInfo);
 
         return ResponseEntity.ok().body(message);
     }
 
     @PostMapping("/delivery/match")
-    public ResponseEntity<Message> matchDelivery(@Valid @RequestBody InvoiceListDto dto) {
-        Message message = this.riderService.matchDelivery(dto);
+    public ResponseEntity<Message> matchDelivery(@Valid @RequestBody MatchingRequestDto dto) {
+        Message message = new Message();
+
+        List<Invoice> invoiceList = this.riderService.matchDelivery(dto);
+        List<InvoiceItemDto> responseItemList = invoiceList.stream().map(InvoiceItemDto::new).toList();
+
+        MatchingResponseDto matchingResponseDto = new MatchingResponseDto();
+        matchingResponseDto.setInvoiceCount(invoiceList.size());
+        matchingResponseDto.setInvoiceItemList(responseItemList);
+
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("인보이스 매칭 완료");
+        message.setData(matchingResponseDto);
+
         return ResponseEntity.ok().body(message);
     }
 }

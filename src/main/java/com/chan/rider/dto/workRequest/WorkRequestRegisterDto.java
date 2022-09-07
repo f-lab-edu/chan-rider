@@ -16,6 +16,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class WorkRequestRegisterDto {
+
     @NotEmpty
     private String accountId;
 
@@ -25,7 +26,7 @@ public class WorkRequestRegisterDto {
     private LocalDate date;
 
     @NotEmpty
-    private String centerCode;
+    private String localCode;
 
     private boolean pm;
 

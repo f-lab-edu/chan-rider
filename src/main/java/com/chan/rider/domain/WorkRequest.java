@@ -15,9 +15,9 @@ import java.util.List;
 @Table(name = "work_requests")
 public class WorkRequest extends BaseEntity{
 
-    @Column(name = "center_code", length = 5)
+    @Column(name = "local_code", length = 3)
     @NotEmpty
-    private String centerCode;
+    private String localCode;
 
     @Column(name = "date")
     @NotNull
@@ -42,11 +42,9 @@ public class WorkRequest extends BaseEntity{
     @OneToMany(mappedBy = "workRequest", cascade = CascadeType.ALL)
     private List<Invoice> invoices = new ArrayList<>();
 
-
-    public void setCenterCode(String centerCode) {
-        this.centerCode = centerCode;
+    public void setLocalCode(String localCode) {
+        this.localCode = localCode;
     }
-
     public void setDate(LocalDate date) {
         this.date = date;
     }
